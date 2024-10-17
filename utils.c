@@ -128,19 +128,11 @@ void printMatrix(int **matrix, int rows, int columns) {
     printf("\n");
 }
 
-// Writes a matrix to a file
-void writeMatrixToFile(const char *filename, int **matrix, int rows, int columns) {
-    FILE *file = fopen(filename, "w");
-    if (file == NULL) {
-        printf("Error opening file %s\n", filename);
-        return;
-    }
-    for (int i = 0; i < rows; i++) {
-        for(int j = 0; j < columns; j++)
-            fprintf(file, "%d,\t", matrix[i][j]);
-        fprintf(file, "\n");
-    }
-    fclose(file);
+// Frees the memory allocated for a matrix
+void freeMatrix(int **matrix, int rows){
+    for(int i = 0; i < rows; i++)
+        free(matrix[i]);
+    free(matrix);
 }
 
 // Converts a string to uppercase
@@ -256,6 +248,15 @@ int isStringEmpty(char *string){
     return (string == NULL || string[0] == '\0');
 }
 
+// Checks if a string is a palindrome
+int isStringPalindrome(char *string){
+    int size = strlen(string);
+    for(int i = 0; i < size / 2; i++)
+        if(string[i] != string[size - i - 1])
+            return 0;
+    return 1;
+}
+
 // Swaps two integers
 void swapInt(int *a, int *b){
     int aux = *a;
@@ -274,3 +275,428 @@ void swapChar(char *c1, char *c2) {
 int randomNumber(int min, int max){
     return min + rand() % (max - min + 1);
 }
+
+// Swap double function
+void swapDouble(double *a, double *b) {
+    double temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Swap float function
+void swapFloat(float *a, float *b) {
+    float temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+
+// create a new node for a linked list
+Node *createNode(int data) {
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// print a linked list
+void printList(Node *head) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node *current = head;
+    while (current != NULL) {
+        printf("%d -> ", current->data);
+        current = current->next;
+    }
+    printf("NULL\n");
+}
+
+// insert a node at the beginning of the list
+void insertAtBeginning(Node **head, int data){
+    Node *newNode = createNode(data);
+    newNode->next = *head;
+    *head = newNode;
+}
+
+// insert a node at the end of the list
+void insertAtEnd(Node **head, int data){
+    Node *newNode = createNode(data);
+    if(*head == NULL){
+        *head = newNode;
+        return;
+    }
+    Node *current = *head;
+    while(current->next != NULL)
+        current = current->next;
+    current->next = newNode;
+}
+
+// insert a node at a certain position
+void insertAtPosition(Node **head, int data, int position){
+    if(position < 0){
+        printf("Invalid position\n");
+        return;
+    }
+    if(position == 0){
+        insertAtBeginning(head, data);
+        return;
+    }
+    Node *newNode = createNode(data);
+    Node *current = *head;
+    for(int i = 0; i < position - 1; i++){
+        if(current == NULL){
+            printf("Invalid position\n");
+            return;
+        }
+        current = current->next;
+    }
+    if(current == NULL){
+        printf("Invalid position\n");
+        return;
+    }
+    newNode->next = current->next;
+    current->next = newNode;
+}
+
+// delete a node with a certain value
+void deleteNode(Node **head, int data){
+    if(*head == NULL){
+        printf("List is empty\n");
+        return;
+    }
+    Node *current = *head;
+    if(current->data == data){
+        *head = current->next;
+        free(current);
+        return;
+    }
+    while(current->next != NULL && current->next->data != data)
+        current = current->next;
+    if(current->next == NULL){
+        printf("Element not found\n");
+        return;
+    }
+    Node *temp = current->next;
+    current->next = temp->next;
+    free(temp);
+}
+
+// delete a node at a certain position
+void deleteAtPosition(Node **head, int position){
+    if(*head == NULL){
+        printf("List is empty\n");
+        return;
+    }
+    if(position == 0){
+        Node *temp = *head;
+        *head = temp->next;
+        free(temp);
+        return;
+    }
+    Node *current = *head;
+    for(int i = 0; i < position - 1; i++){
+        if(current == NULL){
+            printf("Invalid position\n");
+            return;
+        }
+        current = current->next;
+    }
+    if(current == NULL || current->next == NULL){
+        printf("Invalid position\n");
+        return;
+    }
+    Node *temp = current->next;
+    current->next = temp->next;
+    free(temp);
+}
+
+// check if a linked list contains a certain value
+int listContains(Node *head, int data){
+    Node *current = head;
+    while(current != NULL){
+        if(current->data == data)
+            return 1;
+        current = current->next;
+    }
+    return 0;
+}
+
+// return the lenght of a linked list
+int listLenght(Node *head){
+    int count = 0;
+    Node *current = head;
+    while(current != NULL){
+        count++;
+        current = current->next;
+    }
+    return count;
+}
+
+// reverse a linked list
+void reverseList(Node **head){
+    Node *prev = NULL;
+    Node *current = *head;
+    Node *next = NULL;
+    while(current != NULL){
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    *head = prev;
+}
+
+// free a linked list
+void freeList(Node **head){
+    Node *current = *head;
+    Node *next;
+    while(current != NULL){
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}
+
+// create a new node for a binary tree
+TreeNode *createTreeNode(int data){
+    TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
+    if(newNode == NULL){
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// insert a new node in a binary tree
+void insertTreeNode(TreeNode **root, int data){
+    if(*root == NULL){
+        *root = createTreeNode(data);
+        return;
+    }
+    if(data < (*root)->data)
+        insertTreeNode(&(*root)->left, data);
+    else
+        insertTreeNode(&(*root)->right, data);
+}
+
+// print a binary tree in order
+void printTreeInOrder(TreeNode *root){
+    if(root == NULL)
+        return;
+    printTreeInOrder(root->left);
+    printf("%d ", root->data);
+    printTreeInOrder(root->right);
+}
+
+// print a binary tree in pre order
+void printTreePreOrder(TreeNode *root){
+    if(root == NULL)
+        return;
+    printf("%d ", root->data);
+    printTreePreOrder(root->left);
+    printTreePreOrder(root->right);
+}
+
+// print a binary tree in post order
+void printTreePostOrder(TreeNode *root){
+    if(root == NULL)
+        return;
+    printTreePostOrder(root->left);
+    printTreePostOrder(root->right);
+    printf("%d ", root->data);
+}
+
+// free a binary tree
+void freeTree(TreeNode **root){
+    if(*root == NULL)
+        return;
+    freeTree(&(*root)->left);
+    freeTree(&(*root)->right);
+    free(*root);
+    *root = NULL;
+}
+
+// check if a binary tree contains a certain value
+int treeContains(TreeNode *root, int data){
+    if(root == NULL)
+        return 0;
+    if(root->data == data)
+        return 1;
+    if(data < root->data)
+        return treeContains(root->left, data);
+    return treeContains(root->right, data);
+}
+
+// return the height of a binary tree
+int treeHeight(TreeNode *root){
+    if(root == NULL)
+        return -1;
+    int leftHeight = treeHeight(root->left);
+    int rightHeight = treeHeight(root->right);
+    return 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
+}
+
+// return the number of leaves in a binary tree
+int treeLeaves(TreeNode *root){
+    if(root == NULL)
+        return 0;
+    if(root->left == NULL && root->right == NULL)
+        return 1;
+    return treeLeaves(root->left) + treeLeaves(root->right);
+}
+
+// find the number of nodes in a binary tree
+int treeNodes(TreeNode *root){
+    if(root == NULL)
+        return 0;
+    return 1 + treeNodes(root->left) + treeNodes(root->right);
+}
+
+// return the sum of all the elements in a binary tree
+int treeSum(TreeNode *root){
+    if(root == NULL)
+        return 0;
+    return root->data + treeSum(root->left) + treeSum(root->right);
+}
+
+// find the maximum value in a binary tree
+int treeMax(TreeNode *root){
+    if(root == NULL)
+        return -1;
+    if(root->right == NULL)
+        return root->data;
+    return treeMax(root->right);
+}
+
+// find the minimum value in a binary tree
+int treeMin(TreeNode *root){
+    if(root == NULL)
+        return -1;
+    if(root->left == NULL)
+        return root->data;
+    return treeMin(root->left);
+}
+
+// Write a string to a file
+void writeStringToFile(const char *filename, char *string){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    fprintf(file, "%s\n", string);
+    fclose(file);
+}
+
+// Write an integer to a file
+void writeIntToFile(const char *filename, int num){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    fprintf(file, "%d\n", num);
+    fclose(file);
+}
+
+// Write a double to a file
+void writeDoubleToFile(const char *filename, double num){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    fprintf(file, "%lf\n", num);
+    fclose(file);
+}
+
+// Write a character to a file
+void writeCharToFile(const char *filename, char c){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    fprintf(file, "%c\n", c);
+    fclose(file);
+}
+
+// Write an integer array to a file
+void writeIntArrayToFile(const char *filename, int *array, int size){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    fprintf(file, "[");
+    for(int i = 0; i < size; i++){
+        fprintf(file, "%d", array[i]);
+        if(i < size - 1)
+            fprintf(file, ",\t");
+    }
+    fprintf(file, "]\n");
+    fclose(file);
+}
+
+// Write a double array to a file
+void writeMatrixToFile(const char *filename, int **matrix, int rows, int columns){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j < columns; j++)
+            fprintf(file, "%d,\t", matrix[i][j]);
+        fprintf(file, "\n");
+    }
+    fclose(file);
+}
+
+// Write a linked list to a file
+void writeListToFile(const char *filename, Node *head){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    Node *current = head;
+    while(current != NULL){
+        fprintf(file, "%d -> ", current->data);
+        current = current->next;
+    }
+    fprintf(file, "NULL\n");
+    fclose(file);
+}
+
+// Write a binary tree to a file
+void writeTreeToFile(const char *filename, TreeNode *root){
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    printTreeInOrder(root);
+    fclose(file);
+}
+
+
+
+
+
+
+
+
+
+
